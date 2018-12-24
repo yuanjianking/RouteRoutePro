@@ -15,12 +15,14 @@ class UserModel{
         
         HttpUtil.shareInstance.request(methodType: HttpUtil.HTTPMethod.POST, urlString: urlString, parameters: HttpUtil.shareInstance.convertStringToDictionary(text: user.yy_modelToJSONString()!), resultBlock: {(json, err) in
             if err != nil{
-                let code:Int = json as! Int
-                if code >= 400 && code < 500 {
-                    CBToast.showToastAction(message: "リクエスト不正")
-                }
-                if code == 500 {
-                    CBToast.showToastAction(message: "システムエラー")
+                if json != nil{
+                    let code:Int = json as! Int
+                    if code >= 400 && code < 500 {
+                        CBToast.showToastAction(message: "リクエスト不正")
+                    }
+                    if code == 500 {
+                        CBToast.showToastAction(message: "システムエラー")
+                    }
                 }
             }else{
                 let r = UserResult()
@@ -39,12 +41,14 @@ class UserModel{
         
         HttpUtil.shareInstance.request(methodType: HttpUtil.HTTPMethod.POST, urlString: urlString, parameters: HttpUtil.shareInstance.convertStringToDictionary(text: user.yy_modelToJSONString()!), resultBlock: {(json, err) in
             if err != nil{
-                let code:Int = json as! Int
-                if code >= 400 && code < 500 {
-                    CBToast.showToastAction(message: "リクエスト不正")
-                }
-                if code == 500 {
-                    CBToast.showToastAction(message: "システムエラー")
+                if json != nil{
+                    let code:Int = json as! Int
+                    if code >= 400 && code < 500 {
+                        CBToast.showToastAction(message: "リクエスト不正")
+                    }
+                    if code == 500 {
+                        CBToast.showToastAction(message: "システムエラー")
+                    }
                 }
             }else{
                 print(json as Any)

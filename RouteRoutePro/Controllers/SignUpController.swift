@@ -41,15 +41,21 @@ class SignUpController: UIViewController, UITextFieldDelegate {
         user.userid = self.userid.text
         user.password = self.password.text
         guard user.name != "" else {
-            CBToast.showToastAction(message: "Name is nil")
+            CBToast.showToastAction(message: "ユーザー名が空いている")
             return
         }
         guard user.userid != "" else {
-            CBToast.showToastAction(message: "UserId is nil")
+            CBToast.showToastAction(message: "ユーザーid空")
             return
         }
         guard user.password != "" else {
-            CBToast.showToastAction(message: "Password is nil")
+            CBToast.showToastAction(message: "パスワードは空")
+            return
+        }
+        let pattern = "^[a-zA-Z0-9_]{2,16}$"
+        let matcher = MyRegex(pattern)
+        if !matcher.match(input: user.name!) {
+            CBToast.showToastAction(message: "ユーザーIDアルファベット、数字、下線を許す")
             return
         }
         user.password = user.password?.md5()

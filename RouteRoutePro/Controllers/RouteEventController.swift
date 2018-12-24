@@ -59,7 +59,7 @@ class RouteEventController: UIViewController,CLLocationManagerDelegate, MKMapVie
         
         //date setting
         //日付フィールドの設定
-        dateFormat.dateFormat = "yyyy-MM-dd"
+        dateFormat.dateFormat = "yyyy/MM/dd"
         startdate.text = dateFormat.string(from: nowDate as Date)
         self.startdate.delegate = self
         

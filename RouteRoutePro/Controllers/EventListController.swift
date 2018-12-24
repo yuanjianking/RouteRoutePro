@@ -10,19 +10,40 @@ import Foundation
 import UIKit
 
 class EventListController: UITableViewController {
-    var myemail:String?
+    var userid:String?
     
     // sample data
     let eventlist = [(id:"e00000001",name:"Test Cycle!",detail:"This is test!",email:"hogehoge@yahoo.co.jp",latitude:"35.658581",longitude:"139.745433",date:"20181120",starttime:"1120",endtime:"1320"),(id:"e00000002",name:"Happy Cycle!",detail:"This is happy test!",email:"fugafuga@gmail.com",latitude:"12.345678",longitude:"123.456789",date:"20181224",starttime:"1020",endtime:"2020"),(id:"e00000003",name:"Horihori Cycle!",detail:"This is horihori!",email:"horifuga@yahoo.co.jp",latitude: "35.658510",longitude:"139.745420",date:"20181027",starttime:"0820",endtime:"2320")]
     
+    private lazy var routeModel = RouteModel()
+    private lazy var eventList = Array<Event>()
+    let dateFormat = DateFormatter()
+    let dbDateFormat = DateFormatter()
+    var sysTime: Int64?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
-        let appDelegate:AppDelegate = UIApplication.shared.delegate as!     AppDelegate
-        myemail = appDelegate.userid!
+        let appDelegate:AppDelegate = UIApplication.shared.delegate as! AppDelegate
+        userid = appDelegate.userid!
         
         let NotifMycation = NSNotification.Name(rawValue:"MyNSNotification")
         NotificationCenter.default.addObserver(self, selector: #selector(upDataChange(notif:)), name: NotifMycation, object: nil)
+        
+        loadData()
+        dateFormat.dateFormat = "yyyy/MM/dd"
+        dbDateFormat.dateFormat = "yyyy/MM/dd HH:mm"
+    }
+    
+    func loadData() {
+        routeModel.eventList { (result: EventListResult) in
+            guard result.eventList != nil else {
+                return
+            }
+            self.sysTime = result.sysTime
+            self.eventList = result.eventList!
+            self.tableView?.reloadData()
+        }
     }
     
     deinit {
@@ -30,7 +51,7 @@ class EventListController: UITableViewController {
     }
     
     @objc func upDataChange(notif: NSNotification) {
-        guard let text: String = notif.object as! String? else { return }
+        loadData()
     }
     
     //route event
@@ -45,23 +66,52 @@ class EventListController: UITableViewController {
     
     //number of rows
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return eventlist.count
+        return eventList.count
     }
     
     //create cells
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "eventcell", for: indexPath)
-        let eventData = eventlist[(indexPath as NSIndexPath).row]
-        cell.textLabel?.text = eventData.name
-        cell.detailTextLabel?.text = eventData.detail
+        let event = eventList[indexPath.row]
+        let title = cell.viewWithTag(1001) as! UILabel
+        let subtitle = cell.viewWithTag(1002) as! UILabel
+        let state = cell.viewWithTag(1003) as! UILabel
+        if event.name != nil {
+            title.text = event.name
+        }
+        if event.detail != nil {
+            subtitle.text = event.detail
+        }
+        
+        if event.startDate != nil && event.startTime != nil && event.endDate != nil && event.endTime != nil {
+            let sTime = dbDateFormat.date(from: event.startDate! + " " + event.startTime!)?.milliStamp
+            let eTime = dbDateFormat.date(from: event.endDate! + " " + event.endTime!)?.milliStamp
+            let timeInterval:TimeInterval = TimeInterval(sysTime!/1000)
+            let date = Date(timeIntervalSince1970: timeInterval)
+            let nowDate = dateFormat.string(from: date as Date)
+            if sTime != nil && eTime != nil {
+                if sysTime! >= sTime! && sysTime! <= eTime! {
+                    state.text = "開催中!"
+                    state.isHidden = false
+                }else if nowDate >= event.startDate! && nowDate <= event.endDate! {
+                    state.text = "本日開催!"
+                    state.isHidden = false
+                }else {
+                    state.isHidden = true
+                }
+            }else{
+                state.isHidden = true
+            }
+        }
+        
         return cell
     }
     
     //tap cells
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let event = eventlist[indexPath.row]
+        let event = eventList[indexPath.row]
         // ここで管理者か一般ユーザか分岐。今はまだ未実装
-        if myemail == event.email {
+        if userid == event.userid {
             //監理者イベント
             self.performSegue(withIdentifier: "goOwnerEvent", sender: self)
         }else{
@@ -74,17 +124,17 @@ class EventListController: UITableViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "goOwnerEvent" {
             if let indexPath = self.tableView.indexPathForSelectedRow {
-                let eventData = eventlist[(indexPath as NSIndexPath).row]
+                let eventData = eventList[(indexPath as NSIndexPath).row]
                 let nav = segue.destination as! UINavigationController
                 let secondView = nav.topViewController as! OwnerEventController
-                secondView.data = eventData
+                secondView.eventData = eventData
             }
         }else if segue.identifier == "goUserEvent" {
             if let indexPath = self.tableView.indexPathForSelectedRow {
-                let eventData = eventlist[(indexPath as NSIndexPath).row]
+                let eventData = eventList[(indexPath as NSIndexPath).row]
                 let nav = segue.destination as! UINavigationController
                 let secondView = nav.topViewController as! UserEventController
-                secondView.data = eventData
+                secondView.eventData = eventData
             }
         }
     }

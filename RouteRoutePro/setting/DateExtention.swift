@@ -33,4 +33,35 @@ extension Date {
         return Calendar.current.dateComponents([.second], from: Date(), to: self).second ?? 0
     }
     
+    var timeStamp : Int {
+        let timeInterval: TimeInterval = self.timeIntervalSince1970
+        let timeStamp = Int(timeInterval)
+        return timeStamp
+    }
+    
+    var milliStamp : Int64 {
+        let timeInterval: TimeInterval = self.timeIntervalSince1970
+        let millisecond = CLongLong(round(timeInterval*1000))
+        return millisecond
+    }
+    
+    func hoursDiff(time: Int64) -> Int {
+        let timeInterval:TimeInterval = TimeInterval(time/1000)
+        let date = Date(timeIntervalSince1970: timeInterval)
+        return Calendar.current.dateComponents([.hour], from: date, to: self).hour ?? 0
+    }
+    
+    func minutesDiff(time: Int64) -> Int {
+        let timeInterval:TimeInterval = TimeInterval(time/1000)
+        let date = Date(timeIntervalSince1970: timeInterval)
+        return Calendar.current.dateComponents([.minute], from: date, to: self).minute ?? 0
+    }
+    
+    func hoursDiff(date: Date) -> Int {
+        return Calendar.current.dateComponents([.hour], from: date, to: self).hour ?? 0
+    }
+    
+    func minutesDiff(date: Date) -> Int {
+        return Calendar.current.dateComponents([.minute], from: date, to: self).minute ?? 0
+    }
 }

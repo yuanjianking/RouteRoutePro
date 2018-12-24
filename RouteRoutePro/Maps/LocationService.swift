@@ -22,6 +22,8 @@ public class LocationService: NSObject, CLLocationManagerDelegate{
     let locationManager: CLLocationManager
     var locationDataArray: [CLLocation]
     var useFilter: Bool
+    var currLocal: CLLocation?
+    var eventStart: Bool = false
     
     
     override init() {
@@ -57,6 +59,16 @@ public class LocationService: NSObject, CLLocationManagerDelegate{
         }
     }
     
+    func stopUpdatingLocation(){
+        if CLLocationManager.locationServicesEnabled(){
+            eventStart = false
+            locationManager.stopUpdatingLocation()
+            locationManager.stopUpdatingHeading()
+            locationDataArray.removeAll()
+            self.currLocal = nil
+        }
+    }
+    
     
     //MARK: CLLocationManagerDelegate protocol methods
     public func locationManager(_ manager: CLLocationManager,
@@ -69,12 +81,18 @@ public class LocationService: NSObject, CLLocationManagerDelegate{
             if useFilter{
                 locationAdded = filterAndAddLocation(newLocation)
             }else{
-                locationDataArray.append(newLocation)
+                if eventStart {
+                    locationDataArray.append(newLocation)
+                }
                 locationAdded = true
             }
             
+            if !locationAdded && self.currLocal == nil && eventStart {
+                locationDataArray.append(newLocation)
+            }
             
-            if locationAdded{
+            if locationAdded || self.currLocal == nil {
+                self.currLocal = newLocation
                 notifiyDidUpdateLocation(newLocation: newLocation)
             }
             
@@ -102,7 +120,9 @@ public class LocationService: NSObject, CLLocationManagerDelegate{
         
         
         print("Location quality is good enough.")
-        locationDataArray.append(location)
+        if eventStart {
+            locationDataArray.append(location)
+        }
         //location処理
 
         //km/s

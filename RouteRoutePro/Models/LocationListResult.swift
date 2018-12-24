@@ -1,18 +1,18 @@
 //
-//  SignupResult.swift
+//  LocationListResult.swift
 //  RouteRoutePro
 //
-//  Created by linkage on 2018/12/7.
+//  Created by linkage on 2018/12/13.
 //  Copyright © 2018年 安齋洸也. All rights reserved.
 //
 
 import Foundation
-import YYModel
 
-@objcMembers class UserResult: NSObject {
-    public var objid: String?
+@objcMembers class LocationListResult: NSObject {
     public var status: String?
-    public var name: String?
+    public var sysTime: Int64 = 0
+    public var startTime: Int64 = 0
+    public var locations: Array<Location>?
     
     override var description: String{
         return yy_modelDescription()
@@ -33,4 +33,11 @@ import YYModel
     override public func setValue(_ value: Any?, forUndefinedKey key: String) {
         
     }
+    
+    static func modelContainerPropertyGenericClass() -> [String: AnyObject]?{
+        return ["locations":Location.self]
+    }
 }
+
+
+
