@@ -19,6 +19,7 @@ import YYModel
     
     public var startTime: Int64 = 0
     public var historyDistance: Double = 0
+    public var currentDistance: Double = 0
     
     public var eventStartDate: String?
     public var eventEndDate: String?

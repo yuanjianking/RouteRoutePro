@@ -146,7 +146,8 @@ class UserEventController: UIViewController, MKMapViewDelegate, LocationDelegate
                 loc.eventStartTime = eventData?.startTime
                 loc.eventEndDate = eventData?.endDate
                 loc.eventEndTime = eventData?.endTime
-                loc.historyDistance = distanceAll + historyDistance
+                loc.currentDistance = distanceAll
+                loc.historyDistance = historyDistance
                 // 経緯度を保存し、計算速度、時間取得
                 routeModel.updateGuestLocation(location: loc) { (result: LocationListResult) in
                     if result.status == "200000"{
@@ -355,6 +356,7 @@ class UserEventController: UIViewController, MKMapViewDelegate, LocationDelegate
         if distance > 0{
             let speed = distance / (Double((sysTime - startTime)) / 1000.0 / 60.0 / 60.0)
             self.speed.text = String(format:"%.1f", round(speed * 10) / 10)
+            self.distance.text = String(format:"%.1f", distanceAll + historyDistance)
         }
     }
 }
