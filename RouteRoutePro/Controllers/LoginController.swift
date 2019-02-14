@@ -31,6 +31,7 @@ class LoginController: UIViewController, UITextFieldDelegate {
             let appDelegate:AppDelegate = UIApplication.shared.delegate as!     AppDelegate
             appDelegate.userid = user.userid
             appDelegate.name = result.name
+            appDelegate.token = result.token
             self.performSegue(withIdentifier: "doLogin", sender: self)
         }
         

@@ -33,6 +33,13 @@ class HttpUtil: AFHTTPSessionManager {
     }()
     
     func request(methodType:HTTPMethod, urlString:String, parameters: [String:AnyObject]?, resultBlock:@escaping(Any?,Error?)->()) {
+        
+        let appDelegate:AppDelegate = UIApplication.shared.delegate as! AppDelegate
+        let token = appDelegate.token
+        if token != nil{
+            HttpUtil.shareInstance.requestSerializer.setValue(token, forHTTPHeaderField:"token")
+        }
+        
         let url = baseUrl + urlString;
         // If the request succeeds, then the error is nil.
         let successBlock = { (task:URLSessionDataTask, responseObj:Any?)in

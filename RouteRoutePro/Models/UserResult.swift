@@ -13,6 +13,7 @@ import YYModel
     public var objid: String?
     public var status: String?
     public var name: String?
+    public var token: String?
     
     override var description: String{
         return yy_modelDescription()
